@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  BARBER
+  OWNER
+}
+
+enum StylistStatus {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum QueueStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id_user  Int      @id @default(autoincrement())
+  name     String
+  email    String   @unique
+  password String
+  role     Role     @default(CUSTOMER)
+  
+  // Relations
+  stylist  Stylist?
+  queues   Queue[]
+
+  @@map("users")
+}
+
+model Service {
+  id_service   Int      @id @default(autoincrement())
+  service_name String
+  price        Float
+  est_duration Int
+  
+  // Relations
+  queues       Queue[]
+
+  @@map("services")
+}
+
+model Stylist {
+  id_stylist Int           @id @default(autoincrement())
+  id_user    Int           @unique
+  name       String
+  specialty  String
+  status     StylistStatus @default(AVAILABLE)
+
+  // Relations
+  user       User          @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  queues     Queue[]
+  reports    Report[]
+
+  @@map("stylists")
+}
+
+model Queue {
+  id_queue       Int         @id @default(autoincrement())
+  id_user        Int
+  id_service     Int
+  id_stylist     Int
+  queue_number   Int
+  status         QueueStatus @default(PENDING)
+
+  booking_time   DateTime
+  booking_end    DateTime
+  customer_name  String?
+  customer_phone String?
+  created_at     DateTime    @default(now())
+
+  // Relations
+  user           User        @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  service        Service     @relation(fields: [id_service], references: [id_service], onDelete: Cascade)
+  stylist        Stylist     @relation(fields: [id_stylist], references: [id_stylist], onDelete: Cascade)
+
+  @@map("queues")
+}
+
+model Report {
+  id_report     Int      @id @default(autoincrement())
+  period        DateTime
+  total_queue   Int      @default(0)
+  total_revenue Float    @default(0.0)
+  id_stylist    Int
+
+  // Relations
+  stylist       Stylist  @relation(fields: [id_stylist], references: [id_stylist], onDelete: Cascade)
+
+  @@map("reports")
+}
