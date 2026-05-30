@@ -126,8 +126,13 @@ const createQueue = async (req, res) => {
     const [startHour, startMin] = opStartStr.split(':').map(Number);
     const [endHour, endMin] = opEndStr.split(':').map(Number);
 
-    const bookingStartMinutes = start_time.getHours() * 60 + start_time.getMinutes();
-    const bookingEndMinutes = end_time.getHours() * 60 + end_time.getMinutes();
+    const tzOptions = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false };
+    const formatter = new Intl.DateTimeFormat('en-GB', tzOptions);
+    const [startH, startM] = formatter.format(start_time).split(':').map(Number);
+    const [endH, endM] = formatter.format(end_time).split(':').map(Number);
+
+    const bookingStartMinutes = startH * 60 + startM;
+    const bookingEndMinutes = endH * 60 + endM;
     const opStartMinutes = startHour * 60 + startMin;
     const opEndMinutes = endHour * 60 + endMin;
 
