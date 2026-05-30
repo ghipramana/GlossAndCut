@@ -123,16 +123,13 @@ const createQueue = async (req, res) => {
       if (s.key === 'operational_end') opEndStr = s.value;
     });
 
-    const [startHour, startMin] = opStartStr.split(':').map(Number);
-    const [endHour, endMin] = opEndStr.split(':').map(Number);
+    // Convert to WIB (UTC+7) for operational hour comparison
+    const WIB_OFFSET = 7 * 60 * 60 * 1000;
+    const startWIB = new Date(start_time.getTime() + WIB_OFFSET);
+    const endWIB = new Date(end_time.getTime() + WIB_OFFSET);
 
-    const tzOptions = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false };
-    const formatter = new Intl.DateTimeFormat('en-GB', tzOptions);
-    const [startH, startM] = formatter.format(start_time).split(':').map(Number);
-    const [endH, endM] = formatter.format(end_time).split(':').map(Number);
-
-    const bookingStartMinutes = startH * 60 + startM;
-    const bookingEndMinutes = endH * 60 + endM;
+    const bookingStartMinutes = startWIB.getUTCHours() * 60 + startWIB.getUTCMinutes();
+    const bookingEndMinutes = endWIB.getUTCHours() * 60 + endWIB.getUTCMinutes();
     const opStartMinutes = startHour * 60 + startMin;
     const opEndMinutes = endHour * 60 + endMin;
 
