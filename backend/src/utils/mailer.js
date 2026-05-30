@@ -10,7 +10,8 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendResetEmail = async (toEmail, token) => {
-  const resetLink = `http://localhost:3000/?token=${token}`;
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const resetLink = `${frontendUrl}/?token=${token}`;
   
   const mailOptions = {
     from: `"Gloss & Cut" <${process.env.EMAIL_USER}>`,

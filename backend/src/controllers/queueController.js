@@ -123,6 +123,9 @@ const createQueue = async (req, res) => {
       if (s.key === 'operational_end') opEndStr = s.value;
     });
 
+    const [startHour, startMin] = opStartStr.split(':').map(Number);
+    const [endHour, endMin] = opEndStr.split(':').map(Number);
+
     // Convert to WIB (UTC+7) for operational hour comparison
     const WIB_OFFSET = 7 * 60 * 60 * 1000;
     const startWIB = new Date(start_time.getTime() + WIB_OFFSET);
