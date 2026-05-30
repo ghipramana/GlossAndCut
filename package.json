@@ -1,0 +1,11 @@
+{
+  "name": "glosscut-root",
+  "version": "1.0.0",
+  "description": "Root package.json specifically to help Glitch.com automatically run the backend.",
+  "scripts": {
+    "start": "cd backend && npm install && npx prisma generate && npm start"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
